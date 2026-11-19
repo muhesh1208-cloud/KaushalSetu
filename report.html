@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Official RPL Skill Report - {{ worker.name }} | KaushalSetu{% endblock %}
+
+{% block content %}
+<section class="section" style="padding: 40px 0 80px;">
+  <div class="container container-narrow">
+
+    <!-- Action Bar (Hidden on print) -->
+    <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-navy btn-sm">
+        &larr; Return to Assessor Dashboard
+      </a>
+      <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('practical', worker_id=worker.id) }}" class="btn btn-outline btn-sm">
+          ✏️ Edit Assessment
+        </a>
+        <button onclick="window.print()" class="btn btn-primary btn-sm">
+          🖨️ Print Report / Save PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Official Report Page Container -->
+    <div class="report-page-container" style="background: #ffffff; border: 1.5px solid var(--border-color); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;">
+      
+      <!-- Report Header -->
+      <div style="border-bottom: 2px solid var(--primary-navy); padding-bottom: 20px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+            <div class="logo-badge" style="width: 38px; height: 38px; font-size: 1.1rem;">KS</div>
+            <div>
+              <div style="font-size: 1.35rem; font-weight: 900; color: var(--primary-navy); letter-spacing: -0.02em;">
+                KAUSHAL<span>SETU</span>
+              </div>
+              <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600;">
+                National RPL Skill Assessment & Validation Transcript
+              </div>
+            </div>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">
+            Aligned with National Skills Qualifications Framework (NSQF) & PMKVY RPL Guidelines
+          </div>
+        </div>
+
+        <div style="text-align: right;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary-navy);">
+            REPORT REF: RPL-2026-{{ worker.id }}{{ '%04d' % worker.id }}
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">
+            Issued: {{ assessment.assessment_date if assessment else 'Pending' }}
+          </div>
+          <div style="margin-top: 6px;">
+            <span class="badge badge-navy" style="font-size: 0.72rem;">SIH 2026 Certified System</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Candidate & Qualification Details Grid -->
+      <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin-bottom: 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; font-size: 0.9rem;">
+        <div>
+          <div><strong style="color: var(--primary-navy);">Candidate Name:</strong> {{ worker.name }}</div>
+          <div><strong style="color: var(--primary-navy);">Contact Mobile:</strong> {{ worker.mobile }}</div>
+          <div><strong style="color: var(--primary-navy);">National ID / Aadhaar:</strong> {{ worker.aadhaar_masked or 'Verified by Assessor' }}</div>
+          <div><strong style="color: var(--primary-navy);">State / District:</strong> {{ worker.district }}, {{ worker.state }}</div>
+        </div>
+        <div>
+          <div><strong style="color: var(--primary-navy);">Vocational Trade:</strong> {{ qp.name }}</div>
+          <div><strong style="color: var(--primary-navy);">Qualification Pack (QP):</strong> {{ qp.code }}</div>
+          <div><strong style="color: var(--primary-navy);">NSQF Target Level:</strong> Level {{ qp.nsqf_level }}</div>
+          <div><strong style="color: var(--primary-navy);">Reported Prior Experience:</strong> {{ worker.years_experience }} Years</div>
+        </div>
+      </div>
+
+      <!-- Final Assessment Decision Banner -->
+      <div style="margin-bottom: 28px; padding: 20px; border-radius: var(--radius-md); text-align: center; border: 2px solid {% if assessment and assessment.decision == 'Competent' %}var(--success){% elif assessment and assessment.decision == 'Needs Bridge Training' %}var(--warning){% else %}var(--danger){% endif %}; background: {% if assessment and assessment.decision == 'Competent' %}var(--success-bg){% elif assessment and assessment.decision == 'Needs Bridge Training' %}var(--warning-bg){% else %}var(--danger-bg){% endif %};">
+        <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px;">
+          Sector Skill Council Assessor Endorsement
+        </div>
+        <div style="font-size: 1.6rem; font-weight: 900; color: {% if assessment and assessment.decision == 'Competent' %}#065f46{% elif assessment and assessment.decision == 'Needs Bridge Training' %}#92400e{% else %}#991b1b{% endif %};">
+          {% if assessment %}
+            {{ assessment.decision|upper }}
+            {% if assessment.decision == 'Competent' %}
+              — RECOMMENDED FOR NSQF LEVEL {{ qp.nsqf_level }} CERTIFICATE
+            {% endif %}
+          {% else %}
+            ASSESSMENT PENDING (AI SCREENING COMPLETE)
+          {% endif %}
+        </div>
+        <div style="font-size: 0.95rem; margin-top: 6px; color: var(--text-main);">
+          Composite Assessment Score: 
+          <strong style="font-size: 1.15rem; color: var(--primary-navy);">
+            {{ assessment.overall_score if assessment else mapping.overall_confidence }}%
+          </strong>
+        </div>
+      </div>
+
+      <!-- Component Score Breakdown -->
+      {% if assessment %}
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; text-align: center;">
+        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; background: #ffffff;">
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy);">{{ mapping.overall_confidence }}%</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">AI Narrative Match</div>
+        </div>
+        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; background: #ffffff;">
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary-teal);">{{ assessment.practical_score }}%</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Practical Demo (50%)</div>
+        </div>
+        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; background: #ffffff;">
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent-navy);">{{ assessment.viva_score }}%</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Oral Viva (30%)</div>
+        </div>
+        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; background: #ffffff;">
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--success);">{{ assessment.safety_score }}%</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Safety/PPE (20%)</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Demonstrated Competencies Table -->
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 14px;">
+        Demonstrated National Occupational Standards (NOS)
+      </h3>
+
+      <div class="table-responsive" style="margin-bottom: 28px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>NOS Code</th>
+              <th>Occupational Competency Standard</th>
+              <th>Weight</th>
+              <th>Score</th>
+              <th>Assessor Evaluation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for nos in qp.nos_list %}
+              {% set nos_score = assessment.checklist_scores[nos.code] if (assessment and assessment.checklist_scores and nos.code in assessment.checklist_scores) else (mapping.competency_results[loop.index0].score if mapping else 75) %}
+              <tr>
+                <td><span class="nos-code-badge" style="font-size: 0.75rem;">{{ nos.code }}</span></td>
+                <td>
+                  <strong style="color: var(--primary-navy);">{{ nos.title }}</strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">{{ nos.performance_criteria[0] }}</div>
+                </td>
+                <td>{{ nos.weight }}%</td>
+                <td><strong>{{ nos_score }}%</strong></td>
+                <td>
+                  {% if nos_score >= 70 %}
+                    <span class="badge badge-success">Competent</span>
+                  {% elif nos_score >= 50 %}
+                    <span class="badge badge-warning">Needs Practice</span>
+                  {% else %}
+                    <span class="badge badge-danger">Gap Identified</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Skills Needing Improvement & Bridge Training -->
+      <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin-bottom: 28px;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+          Bridge Training & Skill Enhancement Recommendations:
+        </h4>
+        {% if assessment and assessment.bridge_training_modules %}
+          <p style="font-size: 0.9rem; color: #92400e; background: var(--warning-bg); padding: 10px 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--warning); margin: 0;">
+            <strong>Mandatory Bridge Modules:</strong> {{ assessment.bridge_training_modules }}
+          </p>
+        {% elif assessment and assessment.decision == 'Competent' %}
+          <p style="font-size: 0.9rem; color: #065f46; margin: 0;">
+            ✓ Candidate has demonstrated comprehensive proficiency across all core performance criteria. No mandatory bridge training required.
+          </p>
+        {% else %}
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+            Assessment in progress. AI preliminary scan suggests focusing practical viva on diagnostic testing and chemical earthing protocols.
+          </p>
+        {% endif %}
+      </div>
+
+      <!-- Physical Evidence & Assessor Notes -->
+      {% if assessment and assessment.evidence_notes %}
+      <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; margin-bottom: 28px;">
+        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+          Assessor Physical Evidence Record:
+        </div>
+        <div style="font-size: 0.88rem; color: var(--secondary-navy); line-height: 1.5;">
+          {{ assessment.evidence_notes }}
+        </div>
+        <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-muted);">
+          <strong>Assessor Comments:</strong> {{ assessment.assessor_comments }}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Assessor Formal Signature Block -->
+      <div class="assessor-sign-block" style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 24px; border-top: 1.5px dashed var(--border-color);">
+        <div style="font-size: 0.82rem; color: var(--text-muted); max-width: 320px; line-height: 1.4;">
+          <strong>Legal Statement:</strong> This evaluation was conducted in compliance with NSQF RPL Level descriptors. The assessor confirms physical or proctored practical verification.
+        </div>
+
+        <div style="text-align: right; min-width: 240px;">
+          <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 4px;">
+            {{ assessment.assessor_name if assessment else 'Authorized Sector Assessor' }}
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">
+            Certified RPL Assessor
+          </div>
+          <div style="font-size: 0.75rem; color: var(--primary-teal); font-weight: 600;">
+            Reg ID: {{ assessment.assessor_id if assessment else 'ESSCI-ASSESS-8842' }}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+            Date: {{ assessment.assessment_date if assessment else 'Pending Signature' }}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}

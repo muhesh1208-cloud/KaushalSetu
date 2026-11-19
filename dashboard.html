@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Assessor Dashboard - KaushalSetu{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <!-- Dashboard Header -->
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+      <div>
+        <span class="section-tag">Authorized Assessor Portal</span>
+        <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--primary-navy); letter-spacing: -0.02em;">
+          Candidate Assessment Pipeline
+        </h1>
+        <p style="font-size: 0.95rem; color: var(--text-muted);">
+          Manage RPL candidates, review AI preliminary mapping evidence, conduct practical evaluations, and authorize NSQF certifications.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <a href="{{ url_for('register') }}" class="btn btn-primary">
+          <span>+</span> Register New Candidate
+        </a>
+      </div>
+    </div>
+
+    <!-- Summary Statistics Grid -->
+    <div class="stats-grid" style="margin-bottom: 30px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm);">
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.total_candidates }}</div>
+        <div class="stat-label">Total Candidates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--success);">{{ stats.total_certified }}</div>
+        <div class="stat-label">Certified (RPL Completed)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--warning);">{{ stats.pending_assessments }}</div>
+        <div class="stat-label">Pending Practical Exams</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--primary-teal);">{{ stats.avg_score }}%</div>
+        <div class="stat-label">Average Certified Score</div>
+      </div>
+    </div>
+
+    <!-- Search & Filters Bar -->
+    <form action="{{ url_for('dashboard') }}" method="GET" class="filter-bar">
+      <div class="filter-controls">
+        <!-- Search Input -->
+        <input 
+          type="text" 
+          name="search" 
+          class="form-control" 
+          placeholder="Search by name, mobile, or district..." 
+          value="{{ search_query }}" 
+          style="width: 280px;"
+        >
+
+        <!-- Trade Filter -->
+        <select name="trade" class="form-select" style="width: 220px;" onchange="this.form.submit()">
+          <option value="all" {% if trade_filter == 'all' %}selected{% endif %}>All Vocational Trades</option>
+          {% for t in trades %}
+            <option value="{{ t.id }}" {% if trade_filter == t.id %}selected{% endif %}>{{ t.name }}</option>
+          {% endfor %}
+        </select>
+
+        <!-- Status Filter -->
+        <select name="status" class="form-select" style="width: 200px;" onchange="this.form.submit()">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
+          <option value="Registered" {% if status_filter == 'Registered' %}selected{% endif %}>Registered</option>
+          <option value="Experience Submitted" {% if status_filter == 'Experience Submitted' %}selected{% endif %}>Experience Submitted</option>
+          <option value="AI Analyzed" {% if status_filter == 'AI Analyzed' %}selected{% endif %}>AI Analyzed</option>
+          <option value="Certified" {% if status_filter == 'Certified' %}selected{% endif %}>Certified</option>
+          <option value="Needs Bridge Training" {% if status_filter == 'Needs Bridge Training' %}selected{% endif %}>Bridge Training</option>
+        </select>
+
+        <button type="submit" class="btn btn-navy btn-sm">Filter</button>
+        {% if search_query or trade_filter != 'all' or status_filter != 'all' %}
+          <a href="{{ url_for('dashboard') }}" class="btn btn-outline btn-sm">Clear</a>
+        {% endif %}
+      </div>
+
+      <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+        Showing {{ workers|length }} Candidates
+      </div>
+    </form>
+
+    <!-- Candidates Table -->
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Trade & QP</th>
+            <th>Exp</th>
+            <th>AI Match</th>
+            <th>Status</th>
+            <th>Final Score</th>
+            <th style="text-align: right;">Assessor Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if workers %}
+            {% for w in workers %}
+              <tr>
+                <!-- Candidate Details -->
+                <td>
+                  <div style="font-weight: 700; color: var(--primary-navy); font-size: 0.98rem;">{{ w.name }}</div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">
+                    ID: #{{ w.id }} | 📞 {{ w.mobile }} | {{ w.district }}
+                  </div>
+                </td>
+
+                <!-- Trade -->
+                <td>
+                  <div style="font-weight: 600; color: var(--primary-navy);">{{ qp_dict[w.trade].name }}</div>
+                  <div style="font-size: 0.75rem; color: var(--primary-teal); font-weight: 600;">{{ qp_dict[w.trade].code }} (NSQF-{{ qp_dict[w.trade].nsqf_level }})</div>
+                </td>
+
+                <!-- Experience -->
+                <td>
+                  <span style="font-weight: 600;">{{ w.years_experience }} Yrs</span>
+                </td>
+
+                <!-- AI Score -->
+                <td>
+                  {% if w.overall_confidence %}
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-weight: 700; color: {% if w.overall_confidence >= 65 %}var(--success){% elif w.overall_confidence >= 45 %}var(--warning){% else %}var(--danger){% endif %};">
+                        {{ w.overall_confidence }}%
+                      </span>
+                    </div>
+                  {% else %}
+                    <span style="color: var(--text-light); font-size: 0.8rem;">Pending Story</span>
+                  {% endif %}
+                </td>
+
+                <!-- Status Badge -->
+                <td>
+                  {% if w.status == 'Certified' %}
+                    <span class="badge badge-success">Certified</span>
+                  {% elif w.status == 'AI Analyzed' %}
+                    <span class="badge badge-warning">AI Analyzed</span>
+                  {% elif w.status == 'Needs Bridge Training' %}
+                    <span class="badge badge-danger">Bridge Training</span>
+                  {% elif w.status == 'Experience Submitted' %}
+                    <span class="badge badge-info">Story Submitted</span>
+                  {% else %}
+                    <span class="badge badge-navy">Registered</span>
+                  {% endif %}
+                </td>
+
+                <!-- Final Score / Decision -->
+                <td>
+                  {% if w.final_score %}
+                    <div style="font-weight: 800; color: var(--primary-teal);">{{ w.final_score }}%</div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted);">{{ w.practical_decision }}</div>
+                  {% else %}
+                    <span style="color: var(--text-light); font-size: 0.8rem;">Not Assessed</span>
+                  {% endif %}
+                </td>
+
+                <!-- Actions -->
+                <td style="text-align: right;">
+                  <div style="display: inline-flex; gap: 6px;">
+                    <!-- If experience not yet submitted -->
+                    {% if w.status == 'Registered' %}
+                      <a href="{{ url_for('experience', worker_id=w.id) }}" class="btn btn-outline btn-sm" title="Submit Experience">
+                        Add Story
+                      </a>
+                    {% else %}
+                      <!-- Review Evidence / AI Mapping -->
+                      <a href="{{ url_for('skill_mapping', worker_id=w.id) }}" class="btn btn-outline btn-sm" title="Review AI Skill Mapping & Evidence">
+                        AI Evidence
+                      </a>
+                    {% endif %}
+
+                    <!-- Practical Assessment Button -->
+                    <a href="{{ url_for('practical', worker_id=w.id) }}" class="btn btn-navy btn-sm" title="Conduct Practical Exam">
+                      Practical Exam
+                    </a>
+
+                    <!-- View Final Report -->
+                    {% if w.status in ['Certified', 'Needs Bridge Training'] or w.final_score %}
+                      <a href="{{ url_for('report', worker_id=w.id) }}" class="btn btn-primary btn-sm" title="View Official RPL Skill Report">
+                        Report
+                      </a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                No candidates found matching the selected filters.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

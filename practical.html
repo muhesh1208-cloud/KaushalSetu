@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Practical Assessment - KaushalSetu{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container container-narrow">
+
+    <!-- Candidate Summary Banner -->
+    <div class="candidate-header-card" style="margin-bottom: 24px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <h1 style="font-size: 1.85rem; font-weight: 800; color: #ffffff;">{{ worker.name }}</h1>
+          <span class="badge badge-navy" style="background: rgba(255,255,255,0.25);">ID #{{ worker.id }}</span>
+          <span class="badge badge-warning">Practical Assessment Stage</span>
+        </div>
+        <div class="candidate-profile-meta">
+          <span><strong>Trade:</strong> {{ qp.name }} ({{ qp.code }})</span>
+          <span><strong>Prior Exp:</strong> {{ worker.years_experience }} Years</span>
+          <span><strong>AI Preliminary Score:</strong> {{ mapping.overall_confidence }}%</span>
+        </div>
+      </div>
+
+      <!-- Live Assessor Score Counter -->
+      <div class="overall-score-gauge">
+        <div class="gauge-score" id="liveOverallScore">--%</div>
+        <div class="gauge-label">Live RPL Composite Score</div>
+      </div>
+    </div>
+
+    <!-- Practical Assessment Form -->
+    <div class="form-card">
+      <form action="{{ url_for('practical', worker_id=worker.id) }}" method="POST">
+        
+        <!-- Assessor Metadata -->
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1.5px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+          <span>📋</span> Assessor Identification & Examination Meta
+        </h3>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label for="assessor_name" class="form-label">Assessor Name <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="assessor_name" 
+              name="assessor_name" 
+              class="form-control" 
+              value="{{ assessment.assessor_name if assessment else 'Dr. Arvind Mehta' }}" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="assessor_id" class="form-label">Assessor SSC ID <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="assessor_id" 
+              name="assessor_id" 
+              class="form-control" 
+              value="{{ assessment.assessor_id if assessment else 'SSC-ASSESS-8842' }}" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="assessment_date" class="form-label">Date of Evaluation <span class="required">*</span></label>
+            <input 
+              type="date" 
+              id="assessment_date" 
+              name="assessment_date" 
+              class="form-control" 
+              value="{{ assessment.assessment_date if assessment else '2026-11-19' }}" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Competency Checklist per NOS -->
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin: 28px 0 16px; padding-bottom: 8px; border-bottom: 1.5px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>🔧</span> Practical Demonstration Checklist (50% Weight)
+          </div>
+          <span id="livePracticalScore" style="font-size: 1rem; color: var(--primary-teal); font-weight: 800;">70.0%</span>
+        </h3>
+
+        <div class="checklist-items-container">
+          {% for nos in qp.nos_list %}
+            {% set nos_saved_score = assessment.checklist_scores[nos.code] if (assessment and assessment.checklist_scores and nos.code in assessment.checklist_scores) else 75 %}
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div>
+                  <span class="nos-code-badge" style="font-size: 0.75rem;">{{ nos.code }}</span>
+                  <strong style="margin-left: 8px; color: var(--primary-navy); font-size: 0.95rem;">{{ nos.title }}</strong>
+                </div>
+                <div style="text-align: right;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Weight: {{ nos.weight }}%</span>
+                  <div id="val_score_{{ nos.code }}" style="font-weight: 800; color: var(--primary-teal); font-size: 1.05rem;">
+                    {{ nos_saved_score }}%
+                  </div>
+                </div>
+              </div>
+
+              <!-- Score Slider -->
+              <input 
+                type="range" 
+                id="score_{{ nos.code }}" 
+                name="nos_score_{{ nos.code }}" 
+                class="nos-score-input" 
+                min="0" 
+                max="100" 
+                step="5" 
+                value="{{ nos_saved_score }}"
+                data-weight="{{ nos.weight }}"
+                style="width: 100%; accent-color: var(--primary-teal); cursor: pointer;"
+              >
+
+              <!-- Quick Criteria Sample -->
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+                <strong>Key Benchmark:</strong> {{ nos.performance_criteria[0] }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Viva-Voce & Safety Compliance Scores -->
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin: 28px 0 16px; padding-bottom: 8px; border-bottom: 1.5px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+          <span>🗣️</span> Viva-Voce & Workplace Safety Scoring
+        </h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="viva_score" class="form-label">
+              Oral Viva-Voce Score (30% Weight) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="viva_score" 
+              name="viva_score" 
+              class="form-control" 
+              min="0" 
+              max="100" 
+              value="{{ assessment.viva_score if assessment else 80 }}" 
+              required
+            >
+            <span class="form-hint">Evaluates conceptual grasp of troubleshooting and technical fundamentals.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="safety_score" class="form-label">
+              Occupational Health & PPE Score (20% Weight) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="safety_score" 
+              name="safety_score" 
+              class="form-control" 
+              min="0" 
+              max="100" 
+              value="{{ assessment.safety_score if assessment else 85 }}" 
+              required
+            >
+            <span class="form-hint">Evaluates adherence to safety protocols, earthing/ppe, and waste handling.</span>
+          </div>
+        </div>
+
+        <!-- Evidence & Comments -->
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin: 28px 0 16px; padding-bottom: 8px; border-bottom: 1.5px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+          <span>📸</span> Observation Evidence & Assessor Decision
+        </h3>
+
+        <div class="form-group">
+          <label for="evidence_notes" class="form-label">Workshop / On-Site Physical Evidence Notes</label>
+          <textarea 
+            id="evidence_notes" 
+            name="evidence_notes" 
+            rows="3" 
+            class="form-control" 
+            placeholder="Record physical observations (e.g. Candidate wired a 4-pole distribution board in 18 minutes, verified insulation with Megger reading 50MΩ, wore insulated boots and safety glasses)..."
+          >{{ assessment.evidence_notes if assessment else 'Demonstrated live test board installation and successfully diagnosed short-circuit fault using digital multimeter.' }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="assessor_comments" class="form-label">Assessor Qualitative Remarks</label>
+          <textarea 
+            id="assessor_comments" 
+            name="assessor_comments" 
+            rows="3" 
+            class="form-control" 
+            placeholder="Summarize candidate's technical strengths and any areas where improvement is needed..."
+          >{{ assessment.assessor_comments if assessment else 'Candidate demonstrated solid industrial trade competence. Tool handling was ergonomic and methodical.' }}</textarea>
+        </div>
+
+        <!-- Final Decision -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="decision" class="form-label">
+              Assessor Final Decision <span class="required">*</span>
+            </label>
+            <select id="decision" name="decision" class="form-select" required>
+              <option value="Competent" {% if assessment and assessment.decision == 'Competent' %}selected{% endif %}>
+                COMPETENT - Recommended for NSQF Level {{ qp.nsqf_level }} Certification
+              </option>
+              <option value="Needs Bridge Training" {% if assessment and assessment.decision == 'Needs Bridge Training' %}selected{% endif %}>
+                NEEDS BRIDGE TRAINING - Short Course Required (12-30 Hours)
+              </option>
+              <option value="Rejected" {% if assessment and assessment.decision == 'Rejected' %}selected{% endif %}>
+                RE-ASSESSMENT REQUIRED - Insufficient Practical Demonstration
+              </option>
+            </select>
+            <div style="margin-top: 8px;">
+              <span id="liveDecisionBadge" class="badge badge-success">Recommendation: COMPETENT</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bridge_modules" class="form-label">Bridge Training Modules (If Required)</label>
+            <input 
+              type="text" 
+              id="bridge_modules" 
+              name="bridge_modules" 
+              class="form-control" 
+              placeholder="e.g. Advanced Megger Testing, Solar Inverter Earthing"
+              value="{{ assessment.bridge_training_modules if assessment else '' }}"
+            >
+            <span class="form-hint">Leave blank if candidate is assessed as fully Competent.</span>
+          </div>
+        </div>
+
+        <!-- Form Submit Bar -->
+        <div style="margin-top: 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+          <a href="{{ url_for('skill_mapping', worker_id=worker.id) }}" class="btn btn-navy btn-sm">
+            &larr; Back to AI Skill Mapping
+          </a>
+
+          <button type="submit" class="btn btn-primary btn-lg">
+            <span>💾</span> Save Assessment & Generate Official RPL Report &rarr;
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/assessor.js') }}"></script>
+{% endblock %}

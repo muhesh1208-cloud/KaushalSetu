@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Experience Narrative Submission - KaushalSetu{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container container-narrow">
+    
+    <!-- Candidate Info Header -->
+    <div class="candidate-header-card" style="margin-bottom: 24px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <h1 style="font-size: 1.6rem; font-weight: 800; color: #ffffff;">{{ worker.name }}</h1>
+          <span class="badge badge-navy" style="background: rgba(255,255,255,0.2);">ID #{{ worker.id }}</span>
+        </div>
+        <div class="candidate-profile-meta">
+          <span><strong>Trade:</strong> {{ qp_dict[worker.trade].name }} ({{ qp_dict[worker.trade].code }})</span>
+          <span><strong>Experience:</strong> {{ worker.years_experience }} Years</span>
+          <span><strong>Location:</strong> {{ worker.district }}, {{ worker.state }}</span>
+          <span><strong>Language:</strong> {{ worker.preferred_language }}</span>
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <span class="badge badge-warning" style="font-size: 0.85rem; padding: 6px 14px;">
+          Step 2 of 4: Experience Narrative
+        </span>
+      </div>
+    </div>
+
+    <!-- Submission Card -->
+    <div class="form-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-navy);">
+            Describe Your Hands-on Work Experience
+          </h2>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Share what you do in your daily work, tools handled, problems solved, and safety measures taken.
+          </p>
+        </div>
+
+        <!-- 1-Click Sample Loader for Hackathon Evaluators -->
+        {% if sample_text %}
+        <button type="button" class="btn btn-outline btn-sm" onclick="loadSampleStory({{ sample_text|tojson }})">
+          ⚡ Load Sample {{ qp_dict[worker.trade].name }} Story
+        </button>
+        {% endif %}
+      </div>
+
+      <!-- Voice Input Panel -->
+      <div class="voice-input-panel">
+        <div class="voice-status-indicator">
+          <div class="voice-dot" id="micDot"></div>
+          <span id="micStatusText">Click microphone to dictate your experience</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <select id="voiceLanguage" class="form-select" style="width: auto; padding: 6px 10px; font-size: 0.85rem;">
+            <option value="en-IN">English (India)</option>
+            <option value="hi-IN" {% if worker.preferred_language == 'Hindi' %}selected{% endif %}>Hindi (भारत)</option>
+            <option value="mr-IN" {% if worker.preferred_language == 'Marathi' %}selected{% endif %}>Marathi</option>
+            <option value="bn-IN" {% if worker.preferred_language == 'Bengali' %}selected{% endif %}>Bengali</option>
+            <option value="ta-IN" {% if worker.preferred_language == 'Tamil' %}selected{% endif %}>Tamil</option>
+          </select>
+
+          <button type="button" id="micButton" class="btn btn-outline btn-sm">
+            <span>🎤</span> Start Voice Input
+          </button>
+        </div>
+      </div>
+
+      <!-- Narrative Form -->
+      <form action="{{ url_for('experience', worker_id=worker.id) }}" method="POST">
+        <input type="hidden" id="input_method" name="input_method" value="text">
+
+        <div class="form-group">
+          <label for="experience_text" class="form-label">
+            Experience Story & Technical Details <span class="required">*</span>
+          </label>
+          <textarea 
+            id="experience_text" 
+            name="experience_text" 
+            rows="10" 
+            class="form-control" 
+            placeholder="Type or speak here. For example: Mention the instruments you operate (e.g. multimeter, pipe wrench, trowel, feeler gauge), types of installations or repairs done, diagnostic steps, and personal protective safety gear you wear..."
+            required
+          >{% if existing_exp %}{{ existing_exp.experience_text }}{% endif %}</textarea>
+        </div>
+
+        <!-- Guiding Prompts Box -->
+        <div style="background: #f1f5f9; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 24px;">
+          <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+            💡 Guiding Questions to Help You Get Higher RPL Alignment:
+          </h4>
+          <ul style="font-size: 0.85rem; color: var(--secondary-navy); margin-left: 20px; line-height: 1.6;">
+            <li>Which specific tools or instruments do you use in your daily assignments?</li>
+            <li>How do you prepare materials, read site drawings, or take client measurements?</li>
+            <li>What common faults, breakdowns, or leakages do you diagnose and troubleshoot?</li>
+            <li>What personal protective equipment (gloves, helmet, boots, goggles) and safety steps do you follow?</li>
+          </ul>
+        </div>
+
+        <!-- Submit Button -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+          <a href="{{ url_for('register') }}" class="btn btn-navy btn-sm">
+            &larr; Back to Registration
+          </a>
+
+          <button type="submit" class="btn btn-primary btn-lg">
+            <span>⚡</span> Run AI Skill Mapping Engine &rarr;
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+{% endblock %}

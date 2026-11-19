@@ -1,0 +1,71 @@
+/* ==========================================================================
+   KAUSHALSETU - Official RPL Report Print Stylesheet
+   Optimized for Clean A4 PDF / Hardcopy Printouts
+   ========================================================================== */
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  .site-header,
+  .site-footer,
+  .btn,
+  .nav-actions,
+  .filter-bar,
+  .no-print {
+    display: none !important;
+  }
+
+  .container, .container-narrow {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .report-page-container {
+    border: 2px solid #0f172a !important;
+    padding: 24px !important;
+    margin: 10px auto !important;
+    box-shadow: none !important;
+  }
+
+  .report-watermark {
+    position: absolute;
+    top: 40%;
+    left: 20%;
+    font-size: 5rem;
+    color: rgba(15, 23, 42, 0.04);
+    transform: rotate(-30deg);
+    font-weight: 900;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .table-responsive {
+    border: 1px solid #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .data-table th, .data-table td {
+    border: 1px solid #cccccc !important;
+    padding: 8px !important;
+    color: #000000 !important;
+  }
+
+  .badge {
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+    background: transparent !important;
+  }
+
+  .assessor-sign-block {
+    page-break-inside: avoid;
+    margin-top: 30px;
+    border-top: 1.5px dashed #666666;
+    padding-top: 20px;
+  }
+}

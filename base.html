@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}KaushalSetu - AI-Assisted RPL Skill Assessment Tool{% endblock %}</title>
+  
+  <!-- Modern Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}" media="print">
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="brand-logo" aria-label="KaushalSetu Home">
+          <div class="logo-badge">KS</div>
+          <div class="brand-text">
+            <span class="brand-name">KAUSHAL<span>SETU</span></span>
+            <span class="brand-tagline">AI Skill Assessment for RPL</span>
+          </div>
+        </a>
+
+        <!-- Mobile Navigation Hamburger -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+
+        <!-- Main Navigation Links -->
+        <ul class="nav-links" id="navLinks">
+          <li><a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a></li>
+          <li><a href="{{ url_for('index') }}#how-it-works" class="nav-link">How It Works</a></li>
+          <li><a href="{{ url_for('register') }}" class="nav-link {% if request.path == '/register' %}active{% endif %}">Register Worker</a></li>
+          <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if '/dashboard' in request.path %}active{% endif %}">Assessor Portal</a></li>
+          <li><a href="{{ url_for('index') }}#trades" class="nav-link">Trades</a></li>
+        </ul>
+
+        <!-- Navigation Action Buttons -->
+        <div class="nav-actions">
+          <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">
+            <span>+</span> Onboard Worker
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="btn btn-navy btn-sm">
+            Assessor Dashboard
+          </a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Global Flash Notifications -->
+  <div class="container alert-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+            <button class="alert-close" onclick="dismissAlert(this)">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Body Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand-logo" style="margin-bottom: 16px;">
+            <div class="logo-badge" style="width:36px; height:36px; font-size:1rem;">KS</div>
+            <span class="brand-name" style="font-size:1.15rem;">KAUSHAL<span>SETU</span></span>
+          </div>
+          <p>
+            An AI-Assisted Skill Assessment Tool for Recognition of Prior Learning (RPL), developed for Smart India Hackathon 2026. Empowering informal workers through transparent, explainable skill mapping and certified assessor evaluation.
+          </p>
+          <div style="margin-top: 14px;">
+            <span class="badge badge-navy" style="border: 1px solid rgba(255,255,255,0.2);">SIH 2026 Innovation</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('register') }}">Worker Registration</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Assessor Dashboard</a></li>
+            <li><a href="{{ url_for('index') }}#how-it-works">RPL Framework</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Key Trades</h4>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('index') }}#trades">Domestic Electrician</a></li>
+            <li><a href="{{ url_for('index') }}#trades">General Plumber</a></li>
+            <li><a href="{{ url_for('index') }}#trades">General Mason</a></li>
+            <li><a href="{{ url_for('index') }}#trades">Two-Wheeler Technician</a></li>
+            <li><a href="{{ url_for('index') }}#trades">Arc Welder & Tailor</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Statutory Note</h4>
+          <p style="font-size: 0.82rem; line-height: 1.5; color: #94a3b8;">
+            KaushalSetu complies with National Skills Qualifications Framework (NSQF) and PMKVY RPL guidelines. AI outputs are strictly assistive; legal certification is issued only upon authorized human assessor sign-off.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; {{ current_year }} <strong>KaushalSetu</strong> | Smart India Hackathon 2026 Project.
+        </div>
+        <div>
+          Built with Python Flask, SQLite, and Modern Web Standards.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+
+</body>
+</html>

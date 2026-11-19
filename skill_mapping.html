@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}AI Skill Mapping - KaushalSetu{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <!-- Candidate Profile Banner -->
+    <div class="candidate-header-card">
+      <div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <h1 style="font-size: 1.85rem; font-weight: 800; color: #ffffff;">{{ worker.name }}</h1>
+          <span class="badge badge-navy" style="background: rgba(255,255,255,0.25);">Candidate ID #{{ worker.id }}</span>
+          <span class="badge badge-{{ mapping.readiness_badge }}">{{ mapping.readiness_level }}</span>
+        </div>
+
+        <div class="candidate-profile-meta">
+          <span><strong>Trade:</strong> {{ qp.name }}</span>
+          <span><strong>QP Code:</strong> {{ qp.code }} (NSQF Level {{ qp.nsqf_level }})</span>
+          <span><strong>Sector:</strong> {{ qp.sector }}</span>
+          <span><strong>Experience:</strong> {{ worker.years_experience }} Years</span>
+          <span><strong>Location:</strong> {{ worker.district }}, {{ worker.state }}</span>
+        </div>
+      </div>
+
+      <!-- Overall AI Alignment Score -->
+      <div class="overall-score-gauge">
+        <div class="gauge-score">{{ mapping.overall_confidence }}%</div>
+        <div class="gauge-label">RPL Preliminary Alignment</div>
+      </div>
+    </div>
+
+    <!-- Official Statutory Disclaimer -->
+    <div class="disclaimer-banner">
+      <div style="font-size: 1.6rem; line-height: 1;">⚠️</div>
+      <div>
+        <strong style="display: block; margin-bottom: 4px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em;">
+          Statutory RPL Disclaimer & Notice
+        </strong>
+        <p style="margin: 0; line-height: 1.5;">
+          This analysis is an AI-assisted preliminary mapping designed to screen and assist certified assessors. 
+          <strong>It DOES NOT constitute official certification or an NSQF qualification.</strong> 
+          Final competency certification is strictly the legal responsibility of an authorized Sector Skill Council Assessor following on-site practical demonstration and viva evaluation.
+        </p>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Bar for Assessor Actions -->
+    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 0.9rem; font-weight: 700; color: var(--primary-navy);">Identified Tools from Narrative:</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          {% if mapping.tools_identified %}
+            {% for tool in mapping.tools_identified %}
+              <span class="badge badge-info" style="font-weight: 600;">✓ {{ tool }}</span>
+            {% endfor %}
+          {% else %}
+            <span style="font-size: 0.85rem; color: var(--text-muted);">None explicitly mentioned</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="{{ url_for('practical', worker_id=worker.id) }}" class="btn btn-primary btn-sm">
+          <span>📝</span> Conduct Practical Assessment &rarr;
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-navy btn-sm">
+          Assessor Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Assessor Override Section if present -->
+    {% if mapping.is_overridden %}
+    <div style="background-color: var(--info-bg); border-left: 4px solid var(--info); padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 24px;">
+      <strong style="color: #1e40af; font-size: 0.92rem;">Assessor Review Notes (Override Active):</strong>
+      <p style="color: #1e3a8a; font-size: 0.88rem; margin: 4px 0 0;">{{ mapping.assessor_override_notes }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Detailed National Occupational Standards (NOS) Competency Breakdown -->
+    <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 20px;">
+      National Occupational Standards (NOS) Evaluation
+    </h2>
+
+    <div class="nos-cards-list">
+      {% for nos in mapping.competency_results %}
+        <div class="nos-card">
+          <!-- Card Header -->
+          <div class="nos-card-header">
+            <div class="nos-code-title">
+              <span class="nos-code-badge">{{ nos.code }}</span>
+              <span class="nos-title-text">{{ nos.title }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Weight: {{ nos.weight }}%</span>
+              <span class="badge badge-{{ nos.status_badge }}">{{ nos.status }}</span>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="nos-card-body">
+            <!-- Progress Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 700; color: var(--primary-navy);">
+              <span>AI Preliminary Score</span>
+              <span>{{ nos.score }}%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div 
+                class="progress-bar-fill {% if nos.score < 45 %}score-danger{% elif nos.score < 65 %}score-warning{% endif %}" 
+                style="width: {{ nos.score }}%;"
+              ></div>
+            </div>
+
+            <!-- Transparent Explanation -->
+            <div class="explanation-box">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">
+                🔍 Why this matches (Explainable AI Engine):
+              </strong>
+              {{ nos.explanation }}
+            </div>
+
+            <!-- Performance Criteria & Evidence -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <!-- Aligned Criteria -->
+              <div>
+                <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+                  Official Qualification Pack Criteria:
+                </h4>
+                <ul class="criteria-list">
+                  {% for pc in nos.performance_criteria %}
+                    <li class="criteria-item">
+                      <span class="criteria-check">{% if pc.is_aligned %}✓{% else %}○{% endif %}</span>
+                      <span style="font-size: 0.85rem; color: {% if pc.is_aligned %}var(--primary-navy){% else %}var(--text-muted){% endif %};">
+                        {{ pc.pc_text }}
+                      </span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <!-- Extracted Sentence Evidence & Viva Questions -->
+              <div>
+                <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+                  Candidate Narrative Evidence:
+                </h4>
+                {% if nos.evidence_samples %}
+                  <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; font-size: 0.82rem; color: var(--secondary-navy); font-style: italic;">
+                    "{{ nos.evidence_samples[0] }}"
+                  </div>
+                {% else %}
+                  <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">No direct narrative sentence was found matching this standard.</p>
+                {% endif %}
+
+                {% if nos.viva_questions %}
+                  <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 6px;">
+                    Suggested Assessor Viva Questions:
+                  </h4>
+                  <ul style="font-size: 0.82rem; color: var(--text-muted); margin-left: 18px; line-height: 1.5;">
+                    {% for q in nos.viva_questions %}
+                      <li>{{ q }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Assessor Override Modal / Form -->
+    <div class="card" style="margin-top: 32px; background: #f8fafc;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 10px;">
+        Assessor Override & Clinical Judgment
+      </h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
+        As a certified RPL assessor, you have the statutory right to override or annotate AI observations based on physical document verification or preliminary interview.
+      </p>
+
+      <form action="{{ url_for('override_ai', worker_id=worker.id) }}" method="POST">
+        <div class="form-group">
+          <textarea 
+            name="override_notes" 
+            rows="3" 
+            class="form-control" 
+            placeholder="Enter assessor override remarks (e.g. Candidate produced shop union membership or verified client testimonials for specialized repair work)..."
+          >{{ mapping.assessor_override_notes or '' }}</textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="submit" class="btn btn-navy btn-sm">
+            Save Assessor Remarks
+          </button>
+          <a href="{{ url_for('practical', worker_id=worker.id) }}" class="btn btn-primary btn-sm">
+            Proceed to Hands-on Practical Exam &rarr;
+          </a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

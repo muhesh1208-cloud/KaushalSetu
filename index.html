@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}KaushalSetu - Your Skills Deserve Recognition | SIH 2026{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        <span>Smart India Hackathon 2026 | Skill India RPL Platform</span>
+      </div>
+
+      <h1 class="hero-title">
+        Your Skills Deserve <span class="highlight">Recognition.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Millions of skilled electricians, plumbers, masons, and technicians have mastered their craft through years of hard work. <strong>KaushalSetu</strong> uses explainable AI to map their informal experience directly to national qualification standards, enabling seamless certification through certified assessors.
+      </p>
+
+      <div class="hero-cta">
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+          <span>🚀</span> Get Started - Register Worker
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-white btn-lg">
+          <span>📋</span> Assessor Portal & Pipeline
+        </a>
+        <a href="#rpl-explainer" class="btn btn-navy btn-lg">
+          What is RPL?
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Ribbon -->
+<section class="stats-ribbon">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.total_candidates }}+</div>
+        <div class="stat-label">Candidates Registered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.total_certified }}</div>
+        <div class="stat-label">RPL Certificates Issued</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.pending_assessments }}</div>
+        <div class="stat-label">Pending Assessments</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">6 <span>Sectors</span></div>
+        <div class="stat-label">NSQF Level 3 & 4 QPs</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- What is RPL Section -->
+<section class="section" id="rpl-explainer">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">National Skill Development Framework</span>
+      <h2 class="section-title">Understanding Recognition of Prior Learning (RPL)</h2>
+      <p class="section-desc">
+        Under the Government of India's Skill India Mission and PMKVY, RPL acknowledges competencies acquired through unorganized work experience, self-learning, and apprenticeship.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+      <div class="card card-hover">
+        <div style="font-size: 2rem; margin-bottom: 14px;">🎖️</div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">Formal NSQF Alignment</h3>
+        <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6;">
+          Transforms informal hands-on expertise into standardized National Skills Qualifications Framework (NSQF) levels, recognized across government and private sectors.
+        </p>
+      </div>
+
+      <div class="card card-hover">
+        <div style="font-size: 2rem; margin-bottom: 14px;">📈</div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">Dignity & Higher Wages</h3>
+        <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6;">
+          Certified tradespeople command 20% to 35% higher daily wages, gain credibility with organized contractors, and qualify for overseas employment visas.
+        </p>
+      </div>
+
+      <div class="card card-hover">
+        <div style="font-size: 2rem; margin-bottom: 14px;">🎯</div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">Targeted Bridge Training</h3>
+        <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6;">
+          Instead of forcing experienced artisans into 6-month generic training, RPL identifies exact skill gaps (e.g. digital testing or safety codes) for short 12-to-30 hour bridge courses.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="section section-alt" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">End-to-End Workflow</span>
+      <h2 class="section-title">How KaushalSetu Operates</h2>
+      <p class="section-desc">
+        A seamless 4-step pipeline designed for simplicity, transparency, and assessor accountability.
+      </p>
+    </div>
+
+    <div class="steps-grid">
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3 class="step-title">Worker Registration</h3>
+        <p class="step-desc">
+          Candidate registers their basic profile, years of informal experience, preferred local language, and vocational trade with zero paperwork.
+        </p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3 class="step-title">Experience Narrative</h3>
+        <p class="step-desc">
+          Worker describes their daily tasks, tools handled, and safety practices via text or <strong>hands-free voice input</strong> in their regional language.
+        </p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3 class="step-title">Explainable AI Mapping</h3>
+        <p class="step-desc">
+          AI matches the narrative against official Qualification Pack criteria, extracting concrete evidence sentences and highlighting competencies with complete transparency.
+        </p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3 class="step-title">Assessor Practical Exam</h3>
+        <p class="step-desc">
+          Certified Sector Assessor reviews AI insights, conducts hands-on checklist tests and viva, and authorizes the official RPL Skill Report.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Supported Trades Grid -->
+<section class="section" id="trades">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Vocational Standards</span>
+      <h2 class="section-title">Supported Qualification Packs</h2>
+      <p class="section-desc">
+        Pre-configured with genuine National Occupational Standards (NOS) from NSDC Sector Skill Councils.
+      </p>
+    </div>
+
+    <div class="trades-grid">
+      {% for t in trades %}
+        {% set qp = qp_dict[t.id] %}
+        <div class="trade-card">
+          <div class="trade-icon">
+            {% if t.id == 'electrician' %}⚡
+            {% elif t.id == 'plumber' %}🔧
+            {% elif t.id == 'mason' %}🧱
+            {% elif t.id == 'automotive' %}🏍️
+            {% elif t.id == 'welder' %}🔥
+            {% elif t.id == 'tailor' %}✂️
+            {% endif %}
+          </div>
+          <h3 class="trade-name">{{ t.name }}</h3>
+          <span class="trade-code">QP: {{ t.code }} | NSQF Level {{ qp.nsqf_level }}</span>
+          <p class="trade-desc">{{ qp.description }}</p>
+          <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">{{ qp.nos_list|length }} Standards</span>
+            <a href="{{ url_for('register') }}?trade={{ t.id }}" class="btn btn-outline btn-sm">Assess Trade &rarr;</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Features & Benefits -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Key Innovations</span>
+      <h2 class="section-title">Features Built for True Ground Impact</h2>
+      <p class="section-desc">
+        Addressing India's unorganized workforce challenges through intelligent, accessible technology.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px;">
+      <!-- Feature 1 -->
+      <div class="card" style="display: flex; gap: 20px;">
+        <div style="font-size: 2rem; color: var(--primary-teal);">🎙️</div>
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 6px;">Voice-Enabled Narrative Input</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+            Informal workers may lack formal typing skills. KaushalSetu allows artisans to speak freely about their work using browser speech recognition, ready for Gemini multimodal audio expansion.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="card" style="display: flex; gap: 20px;">
+        <div style="font-size: 2rem; color: var(--primary-teal);">🔍</div>
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 6px;">Zero Black-Box: Explainable AI</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+            Unlike opaque classifiers, our engine explicitly highlights which tools, safety protocols, and performance criteria were verified, along with extracted text snippets.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="card" style="display: flex; gap: 20px;">
+        <div style="font-size: 2rem; color: var(--primary-teal);">⚖️</div>
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 6px;">Human-in-the-Loop Assessor Control</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+            Complies with statutory ethical standards. AI suggestions never replace assessors; certified assessors can override, adjust scores, and hold sole authority over certification.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="card" style="display: flex; gap: 20px;">
+        <div style="font-size: 2rem; color: var(--primary-teal);">📄</div>
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 6px;">Instant Printable RPL Skill Transcript</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+            Generates standardized, tamper-evident skill reports detailing demonstrated competencies, identified skill gaps, and assessor remarks ready for PDF export or hardcopy printing.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section style="background: linear-gradient(135deg, var(--primary-navy) 0%, #0d9488 100%); color: #ffffff; padding: 70px 0; text-align: center;">
+  <div class="container container-narrow">
+    <h2 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 16px;">
+      Ready to Pilot KaushalSetu in Your Assessment Center?
+    </h2>
+    <p style="font-size: 1.1rem; color: #ccfbf1; margin-bottom: 32px; line-height: 1.6;">
+      Start by registering a sample candidate or review active RPL candidates on the Assessor Dashboard.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+      <a href="{{ url_for('register') }}" class="btn btn-navy btn-lg" style="background:#ffffff; color:var(--primary-navy); border:none;">
+        Register New Candidate
+      </a>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline-white btn-lg">
+        Open Assessor Dashboard
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
